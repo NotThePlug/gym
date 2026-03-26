@@ -23,6 +23,7 @@
 }
 html{background:var(--bg);color:var(--tx);font-family:'Newsreader','Georgia',serif;-webkit-font-smoothing:antialiased;line-height:1.55}
 body{max-width:460px;margin:0 auto;padding-bottom:72px;min-height:100vh;min-height:100dvh}
+body.timer-running{padding-bottom:116px}
 input,textarea,button{font-family:inherit}
 .page{padding:20px 16px;padding-top:calc(20px + env(safe-area-inset-top))}
 .header{margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--bd)}
@@ -32,6 +33,7 @@ input,textarea,button{font-family:inherit}
 h1{font-size:28px;font-weight:400;font-style:italic;margin:0 0 6px;letter-spacing:-0.3px}
 .tm-row{display:flex;justify-content:space-between;align-items:center}
 .tm-label{font-size:14px;color:var(--txm)}
+.tm-history{font-size:12px;color:var(--txd);font-family:system-ui,sans-serif;margin-top:3px}
 .link{font-size:12px;color:var(--ac);cursor:pointer;font-family:system-ui,sans-serif;border-bottom:1px dotted var(--ac)}
 .card{background:var(--sf);border-radius:14px;padding:16px 18px;border:1px solid var(--bd);margin-bottom:12px}
 .card-head{display:flex;justify-content:space-between;align-items:center}
@@ -46,7 +48,7 @@ h1{font-size:28px;font-weight:400;font-style:italic;margin:0 0 6px;letter-spacin
 .mob-txt{font-size:13px;color:var(--txd);font-family:system-ui,sans-serif}
 .mob-list{padding-top:4px}
 .mob-item{font-size:13px;color:var(--txm);padding:3px 0}
-.warm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.warm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
 .warm-cell{background:var(--sf2);border-radius:10px;padding:12px 8px;text-align:center;border:1px solid var(--bd);cursor:pointer;position:relative;transition:opacity .15s}
 .warm-cell.done{opacity:.35}
 .warm-wt{font-size:20px;font-weight:700;font-family:system-ui,sans-serif}
@@ -87,7 +89,7 @@ textarea.ta{width:100%;padding:10px 12px;font-size:15px;font-family:'Newsreader'
 .abs-reps{font-size:13px;color:var(--txm);font-family:system-ui,sans-serif;margin-top:6px}
 .btn{width:100%;padding:15px;font-size:14px;font-weight:600;font-family:system-ui,sans-serif;letter-spacing:.5px;text-transform:uppercase;background:var(--ac);color:var(--bg);border:none;border-radius:10px;cursor:pointer;margin-top:14px}
 .btn.off{background:var(--bd);color:var(--txd);cursor:default}
-.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--gn);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-family:system-ui,sans-serif;font-weight:600;z-index:200;opacity:0;transition:opacity .3s}
+.toast{position:fixed;top:calc(16px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--gn);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-family:system-ui,sans-serif;font-weight:600;z-index:400;opacity:0;transition:opacity .3s}
 .toast.show{opacity:1}
 .time-note{text-align:center;font-size:12px;color:var(--txd);padding:16px 0;font-family:system-ui,sans-serif}
 .coach-loading{padding:20px 0;text-align:center;font-size:13px;color:var(--txm);font-family:system-ui,sans-serif;font-style:italic}
@@ -100,6 +102,7 @@ textarea.ta{width:100%;padding:10px 12px;font-size:15px;font-family:'Newsreader'
 .hist-lift{font-size:13px;color:var(--txm);flex:1;margin-left:8px}
 .hist-detail{font-weight:600}
 .hist-note{font-size:12px;color:var(--txd);font-style:italic;margin-top:4px;line-height:1.5}
+.hist-skip{font-size:11px;color:var(--rd);font-family:system-ui,sans-serif;margin-top:3px;opacity:.8}
 .roadmap{display:flex;flex-direction:column}
 .rm-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-left:2px solid var(--bd);margin-left:8px;padding-left:16px;position:relative}
 .rm-item.active{border-left-color:var(--ac)}
@@ -133,24 +136,46 @@ input.max-input{width:80%;padding:8px;font-size:22px;font-family:system-ui,sans-
 .gap-banner{font-size:13px;color:var(--txm);padding:10px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;margin-bottom:12px;line-height:1.5;font-family:system-ui,sans-serif}
 .gap-banner.warn{border-color:var(--rd);color:var(--tx);background:rgba(138,74,74,0.1)}
 .stall-banner{font-size:13px;color:var(--tx);padding:10px 14px;background:rgba(138,74,74,0.1);border:1px solid var(--rd);border-radius:10px;margin-bottom:12px;line-height:1.5;font-family:system-ui,sans-serif}
+.stall-banner .update-tm-link{font-size:12px;color:var(--ac);cursor:pointer;font-family:system-ui,sans-serif;border-bottom:1px dotted var(--ac);display:inline-block;margin-top:6px}
 
-/* Timer */
-.timer-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.timer-display{font-size:72px;font-weight:700;font-family:system-ui,sans-serif;color:var(--tx);margin-bottom:8px;font-variant-numeric:tabular-nums}
-.timer-label{font-size:14px;color:var(--txm);font-family:system-ui,sans-serif;margin-bottom:32px}
-.timer-btns{display:flex;gap:12px}
-.timer-btn{padding:14px 28px;font-size:14px;font-weight:600;font-family:system-ui,sans-serif;border-radius:10px;cursor:pointer;border:none;letter-spacing:.5px;text-transform:uppercase}
-.timer-btn.primary{background:var(--ac);color:var(--bg)}
-.timer-btn.secondary{background:var(--sf2);color:var(--tx);border:1px solid var(--bd)}
-.timer-presets{display:flex;gap:8px;margin-bottom:24px}
-.timer-preset{padding:8px 16px;font-size:13px;font-family:system-ui,sans-serif;background:var(--sf2);color:var(--txm);border:1px solid var(--bd);border-radius:8px;cursor:pointer}
-.timer-preset.active{border-color:var(--ac);color:var(--ac)}
-.timer-ring{width:200px;height:200px;border-radius:50%;border:3px solid var(--bd);position:relative;margin-bottom:20px;display:flex;align-items:center;justify-content:center;flex-direction:column}
-.timer-ring svg{position:absolute;top:-3px;left:-3px;width:206px;height:206px;transform:rotate(-90deg)}
-.timer-ring circle{fill:none;stroke-width:3;cx:103;cy:103;r:100}
-.timer-ring .bg{stroke:var(--bd)}
-.timer-ring .fg{stroke:var(--ac);stroke-linecap:round;transition:stroke-dashoffset .5s linear}
-.timer-done{color:var(--gn);font-size:18px;font-weight:600;font-family:system-ui,sans-serif;margin-top:8px}
+/* Mini timer bar — non-blocking, docks above nav */
+.timer-bar{position:fixed;bottom:calc(56px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:100%;max-width:460px;background:var(--sf);border-top:2px solid var(--ac);display:flex;align-items:center;padding:10px 16px;gap:10px;z-index:200;font-family:system-ui,sans-serif}
+.timer-bar-time{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ac);min-width:52px}
+.timer-bar-label{flex:1;font-size:13px;color:var(--txm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.timer-bar-done{flex:1;font-size:13px;font-weight:600;color:var(--gn)}
+.timer-bar-dismiss{font-size:16px;color:var(--txd);background:none;border:none;cursor:pointer;padding:4px 6px;line-height:1}
+
+/* Warmup quick-pick */
+.warmup-quick{display:flex;gap:8px;margin-top:10px}
+.warmup-quick-btn{flex:1;padding:14px 8px;font-size:13px;font-family:system-ui,sans-serif;font-weight:600;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;color:var(--txm);cursor:pointer;text-align:center;transition:all .15s;line-height:1.3}
+.warmup-quick-btn.done{border-color:var(--gn);color:var(--gn);background:rgba(90,154,92,0.08)}
+.warmup-quick-btn.active-opt{border-color:var(--acBd);color:var(--ac);background:var(--acBg)}
+
+/* AMRAP feedback */
+.amrap-feedback{font-size:13px;margin-top:10px;padding:10px 12px;border-radius:8px;font-family:system-ui,sans-serif;line-height:1.5}
+.amrap-feedback.good{background:rgba(90,154,92,0.08);color:var(--gn);border:1px solid rgba(90,154,92,0.2)}
+.amrap-feedback.warn{background:var(--acBg);color:var(--ac);border:1px solid var(--acBd)}
+.amrap-feedback.high{background:rgba(196,162,101,0.12);color:var(--ac);border:1px solid var(--acBd)}
+
+/* Skip confirm */
+.skip-confirm{margin-top:12px;padding:14px;background:rgba(138,74,74,0.08);border:1px solid rgba(138,74,74,0.25);border-radius:10px;font-family:system-ui,sans-serif}
+.skip-confirm-msg{font-size:13px;color:var(--tx);margin-bottom:12px;line-height:1.5}
+.skip-confirm-btns{display:flex;gap:8px}
+.skip-confirm-ok{flex:1;padding:12px;font-size:13px;font-family:system-ui,sans-serif;font-weight:600;background:var(--ac);color:var(--bg);border:none;border-radius:8px;cursor:pointer;letter-spacing:.3px}
+.skip-confirm-cancel{flex:1;padding:12px;font-size:13px;font-family:system-ui,sans-serif;background:var(--sf2);color:var(--txm);border:1px solid var(--bd);border-radius:8px;cursor:pointer}
+
+/* TM bump panel (post-deload cycle complete) */
+.cycle-complete-panel{background:var(--sf2);border:1px solid var(--acBd);border-radius:12px;padding:16px;margin-top:12px}
+.tm-bump-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--bd)}
+.tm-bump-row:last-child{border-bottom:none}
+.tm-bump-lift{font-size:14px;color:var(--txm);font-family:system-ui,sans-serif;padding-top:2px}
+.tm-bump-right{text-align:right}
+.tm-bump-val{font-size:14px;font-weight:600;font-family:system-ui,sans-serif}
+.tm-bump-val.upgrade{color:var(--ac)}
+.tm-bump-reason{font-size:11px;color:var(--txd);font-family:system-ui,sans-serif;margin-top:2px}
+.tm-bump-btns{display:flex;gap:8px;margin-top:14px}
+.tm-bump-ok{flex:1;padding:13px;font-size:13px;font-family:system-ui,sans-serif;font-weight:600;background:var(--ac);color:var(--bg);border:none;border-radius:8px;cursor:pointer;letter-spacing:.3px}
+.tm-bump-secondary{flex:1;padding:13px;font-size:13px;font-family:system-ui,sans-serif;background:var(--sf2);color:var(--txm);border:1px solid var(--bd);border-radius:8px;cursor:pointer}
 
 /* Rest timer inline */
 .rest-timer-row{display:flex;align-items:center;gap:8px;margin-top:8px}
@@ -212,10 +237,16 @@ const DEFAULT_MAXES={ohp:115,deadlift:245,bench:185,squat:225};
 
 // ═══════ STATE ═══════
 let data=null,currentView="today",coachMsg="",coachLoading=false,lastCoachHistLen=0;
-let session={doneSets:new Set(),doneWarm:new Set(),picks:{},absDone:false,warmDone:false,mobOpen:false,expandedEx:null,showWeekInfo:false,showLiftInfo:false};
+let session={
+  doneSets:new Set(),doneWarm:new Set(),picks:{},absDone:false,warmDone:false,
+  warmMode:null,     // null | 'quick' | 'full'
+  mobOpen:false,expandedEx:null,showWeekInfo:false,showLiftInfo:false,
+  pendingSubmit:false,pendingSkips:[],
+  justFinishedCycle:false,cycleRecs:null,appliedMaxes:null
+};
 
 // Timer state
-let timerInterval=null,timerSeconds=0,timerTotal=0,timerRunning=false;
+let timerInterval=null,timerSeconds=0,timerTotal=0,timerRunning=false,timerLabel="";
 
 function loadData(){
   try{const r=localStorage.getItem(STORAGE_KEY);if(r)data=JSON.parse(r);else{data={maxes:{...DEFAULT_MAXES},cycle:1,week:0,day:0,history:[],bwLog:[]};saveData()}}catch{data={maxes:{...DEFAULT_MAXES},cycle:1,week:0,day:0,history:[],bwLog:[]}}
@@ -223,48 +254,51 @@ function loadData(){
 }
 function saveData(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data))}catch{}}
 function flash(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
-function resetSession(){session={doneSets:new Set(),doneWarm:new Set(),picks:{},absDone:false,warmDone:false,mobOpen:false,expandedEx:null,showWeekInfo:false,showLiftInfo:false}}
+function resetSession(){
+  session={
+    doneSets:new Set(),doneWarm:new Set(),picks:{},absDone:false,warmDone:false,
+    warmMode:null,mobOpen:false,expandedEx:null,showWeekInfo:false,showLiftInfo:false,
+    pendingSubmit:false,pendingSkips:[],
+    justFinishedCycle:false,cycleRecs:null,appliedMaxes:null
+  };
+}
 
-// ═══════ TIMER ═══════
-function startTimer(seconds, label){
-  timerTotal=seconds;timerSeconds=seconds;timerRunning=true;
+// ═══════ TIMER (non-blocking mini-bar) ═══════
+function startTimer(seconds,label){
+  timerTotal=seconds;timerSeconds=seconds;timerRunning=true;timerLabel=label||"";
   clearInterval(timerInterval);
-  renderTimer(label);
+  document.body.classList.add("timer-running");
+  renderTimer();
   timerInterval=setInterval(()=>{
     timerSeconds--;
     if(timerSeconds<=0){
       clearInterval(timerInterval);timerRunning=false;timerSeconds=0;
       try{navigator.vibrate&&navigator.vibrate([200,100,200,100,200])}catch{}
-      renderTimer(label);
-    } else renderTimer(label);
+      renderTimer();
+      setTimeout(stopTimer,3000);
+    }else{
+      renderTimer();
+    }
   },1000);
 }
 
-function stopTimer(){clearInterval(timerInterval);timerRunning=false;timerSeconds=0;document.getElementById("timer-root").innerHTML=""}
-function renderTimer(label){
+function stopTimer(){
+  clearInterval(timerInterval);timerRunning=false;timerSeconds=0;
+  document.body.classList.remove("timer-running");
+  document.getElementById("timer-root").innerHTML="";
+}
+
+function renderTimer(){
   const m=Math.floor(timerSeconds/60),s=timerSeconds%60;
-  const pct=timerTotal>0?(timerSeconds/timerTotal):0;
-  const circ=2*Math.PI*100;
-  const offset=circ*(1-pct);
   const done=timerSeconds<=0&&!timerRunning;
   document.getElementById("timer-root").innerHTML=`
-    <div class="timer-overlay" onclick="event.target===this&&stopTimer()">
-      <div class="timer-ring">
-        <svg viewBox="0 0 206 206"><circle class="bg" /><circle class="fg" stroke-dasharray="${circ}" stroke-dashoffset="${offset}" /></svg>
-        <div class="timer-display">${done?"0:00":`${m}:${s<10?"0":""}${s}`}</div>
-        ${label?`<div class="timer-label">${esc(label)}</div>`:""}
-        ${done?'<div class="timer-done">Time\'s up — get after it</div>':""}
-      </div>
-      <div class="timer-presets">
-        <button class="timer-preset${timerTotal===60?" active":""}" onclick="event.stopPropagation();startTimer(60,'${esc(label||"")}')">1:00</button>
-        <button class="timer-preset${timerTotal===120?" active":""}" onclick="event.stopPropagation();startTimer(120,'${esc(label||"")}')">2:00</button>
-        <button class="timer-preset${timerTotal===180?" active":""}" onclick="event.stopPropagation();startTimer(180,'${esc(label||"")}')">3:00</button>
-        <button class="timer-preset${timerTotal===300?" active":""}" onclick="event.stopPropagation();startTimer(300,'${esc(label||"")}')">5:00</button>
-      </div>
-      <div class="timer-btns">
-        ${done?`<button class="timer-btn primary" onclick="event.stopPropagation();stopTimer()">Done</button>`
-        :`<button class="timer-btn secondary" onclick="event.stopPropagation();stopTimer()">Dismiss</button>`}
-      </div>
+    <div class="timer-bar">
+      <span class="timer-bar-time">${done?"0:00":`${m}:${s<10?"0":""}${s}`}</span>
+      ${done
+        ?'<span class="timer-bar-done">Time\'s up — get after it</span>'
+        :`<span class="timer-bar-label">${esc(timerLabel||"Rest timer")}</span>`
+      }
+      <button class="timer-bar-dismiss" onclick="stopTimer()">✕</button>
     </div>`;
 }
 
@@ -273,25 +307,109 @@ function getStallWarnings(){
   const warnings=[];
   LIFTS.forEach(l=>{
     const hist=data.history.filter(h=>h.lift===l.id&&h.amrapReps!=null);
-    if(hist.length<3)return;
+    if(hist.length<1)return;
     const recent=hist.slice(-3);
-    // Check if AMRAP reps are declining or barely hitting minimum on peak weeks
-    const peakSets=recent.filter(h=>h.week===2); // week index 2 = peak week
+    // Peak week decline
+    const peakSets=recent.filter(h=>h.week===2);
     if(peakSets.length>=2){
       const declining=peakSets.every((h,i)=>i===0||h.amrapReps<=peakSets[i-1].amrapReps);
       const low=peakSets.some(h=>h.amrapReps<=2);
       if(declining&&low){
         const newTm=round5(data.maxes[l.id]*0.9);
-        warnings.push(`<strong>${l.title}</strong> looks like it's stalling — you're barely hitting reps on peak week. Consider dropping your TM from ${data.maxes[l.id]} to ${newTm} lb (10% reduction).`);
+        warnings.push({lift:l.id,title:l.title,type:"stall",msg:`<strong>${l.title}</strong> looks like it's stalling — barely hitting reps on peak week. Consider dropping TM from ${data.maxes[l.id]} to ${newTm} lb (10% reset).`});
       }
     }
-    // Check if volume week AMRAP is very high = TM too low
+    // Volume week too easy — threshold is 1 session (not 2) since early cycles only have one
     const volSets=recent.filter(h=>h.week===0);
-    if(volSets.length>=2&&volSets.every(h=>h.amrapReps>=10)){
-      warnings.push(`<strong>${l.title}</strong> is too easy — you're hitting 10+ reps on your volume week AMRAP. Consider bumping your TM from ${data.maxes[l.id]} to ${data.maxes[l.id]+l.inc*2} lb.`);
+    if(volSets.length>=1&&volSets[volSets.length-1].amrapReps>=10){
+      warnings.push({lift:l.id,title:l.title,type:"too_easy",msg:`<strong>${l.title}</strong> is too easy — ${volSets[volSets.length-1].amrapReps} reps on your volume week AMRAP. Consider bumping TM from ${data.maxes[l.id]} to ${data.maxes[l.id]+l.inc*2} lb.`});
+    }
+    // Intensity week too easy
+    const intSets=recent.filter(h=>h.week===1);
+    if(intSets.length>=1&&intSets[intSets.length-1].amrapReps>=6){
+      // Only warn if not already warned for volume week
+      const alreadyWarned=warnings.some(w=>w.lift===l.id&&w.type==="too_easy");
+      if(!alreadyWarned){
+        warnings.push({lift:l.id,title:l.title,type:"too_easy",msg:`<strong>${l.title}</strong> — ${intSets[intSets.length-1].amrapReps} reps at 90% on intensity week. TM may be a bit low.`});
+      }
     }
   });
   return warnings;
+}
+
+// ═══════ AMRAP FEEDBACK ═══════
+function getAmrapFeedbackData(reps,weekIndex,lift){
+  if(!reps||isNaN(reps)||reps<1)return null;
+  const tm=data.maxes[lift.id];
+  if(weekIndex===0){
+    if(reps>=10)return{cls:"high",msg:`${reps} reps at 85% — TM is too conservative. Consider bumping from ${tm} → ${tm+lift.inc*2} lb next cycle.`};
+    if(reps>=7)return{cls:"warn",msg:`${reps} reps — strong. TM goes up ${lift.inc} lb after deload. You're progressing.`};
+    return{cls:"good",msg:`${reps} reps — right on target. TM goes up normally after deload.`};
+  }
+  if(weekIndex===1){
+    if(reps>=6)return{cls:"high",msg:`${reps} reps at 90% — very strong. TM is likely too low. Consider ${tm} → ${tm+lift.inc*2} lb next cycle.`};
+    if(reps>=4)return{cls:"warn",msg:`${reps} reps at 90% — solid. Standard +${lift.inc} lb after deload.`};
+    return{cls:"good",msg:`${reps} reps at 90% — on track. TM goes up normally.`};
+  }
+  if(weekIndex===2){
+    if(reps>=5)return{cls:"warn",msg:`${reps} reps at 95% — excellent. TM is slightly conservative; an extra bump next cycle is warranted.`};
+    if(reps>=3)return{cls:"good",msg:`${reps} reps at 95% — solid. TM goes up normally.`};
+    return{cls:"good",msg:`${reps===1?"1 rep":""+reps+" reps"} at 95% — that's heavy. TM is well calibrated.`};
+  }
+  return null;
+}
+
+function updateAmrapFeedback(){
+  const input=document.getElementById("amrap-input");
+  const el=document.getElementById("amrap-feedback");
+  if(!input||!el)return;
+  const reps=parseInt(input.value);
+  const lift=LIFTS[data.day];
+  const fb=getAmrapFeedbackData(reps,data.week,lift);
+  if(fb){el.className=`amrap-feedback ${fb.cls}`;el.textContent=fb.msg}
+  else{el.className="amrap-feedback";el.textContent=""}
+}
+
+// ═══════ RECOMMENDED TM BUMPS (post-deload) ═══════
+function calcRecommendedTmBumps(){
+  const recs={};
+  LIFTS.forEach(l=>{
+    const hist=data.history.filter(h=>h.lift===l.id&&h.amrapReps!=null);
+    const lastVol=hist.filter(h=>h.week===0).slice(-1)[0];
+    const lastInt=hist.filter(h=>h.week===1).slice(-1)[0];
+    const lastPeak=hist.filter(h=>h.week===2).slice(-1)[0];
+    let extraInc=0,reason=`standard +${l.inc} lb`;
+    if(lastVol&&lastVol.amrapReps>=10){
+      extraInc=l.inc;reason=`${lastVol.amrapReps} reps on volume week — TM was too conservative`;
+    }else if(lastInt&&lastInt.amrapReps>=6){
+      extraInc=l.inc;reason=`${lastInt.amrapReps} reps at 90% — strong intensity week`;
+    }else if(lastPeak&&lastPeak.amrapReps>=5){
+      extraInc=l.inc;reason=`${lastPeak.amrapReps} reps at 95% — excellent peak`;
+    }
+    recs[l.id]={from:data.maxes[l.id],standard:data.maxes[l.id]+l.inc,recommended:data.maxes[l.id]+l.inc+extraInc,reason};
+  });
+  return recs;
+}
+
+// ═══════ SKIP HELPERS ═══════
+function getSessionSkips(working){
+  const skips=[];
+  const missedSets=working.length-session.doneSets.size;
+  if(missedSets>0)skips.push(`${missedSets} working set${missedSets>1?"s":""}`);
+  const missedAssist=2-Object.keys(session.picks).length;
+  if(missedAssist>0)skips.push(`${missedAssist} assistance exercise${missedAssist>1?"s":""}`);
+  if(!session.absDone)skips.push("ab finisher");
+  return skips;
+}
+
+function formatSkipEntry(skipped){
+  if(!skipped||!skipped.length)return"";
+  return skipped.map(s=>{
+    if(s.type==="working_sets")return`${s.total-s.completed} set${s.total-s.completed>1?"s":""}`;
+    if(s.type==="assistance")return"assistance";
+    if(s.type==="abs")return"abs";
+    return s.type;
+  }).join(", ");
 }
 
 // ═══════ DAYS SINCE ═══════
@@ -369,14 +487,92 @@ function renderCoachSection(){
   else if(coachMsg){const paras=coachMsg.split("\n").filter(p=>p.trim()).map(p=>`<p class="coach-p">${esc(p)}</p>`).join("");el.innerHTML=`<div class="coach-body">${paras}<div class="coach-meta">Based on ${data.history.length} workouts · Updates after each session</div></div>`}
 }
 
+// ═══════ CYCLE COMPLETE PANEL ═══════
+function renderCycleCompletePanel(){
+  const recs=session.cycleRecs;
+  const applied=session.appliedMaxes;
+  const anyUpgrade=LIFTS.some(l=>recs[l.id].recommended>recs[l.id].standard);
+
+  let rows=LIFTS.map(l=>{
+    const r=recs[l.id];
+    const upgrade=r.recommended>r.standard;
+    return`<div class="tm-bump-row">
+      <span class="tm-bump-lift">${esc(l.title)}</span>
+      <div class="tm-bump-right">
+        ${upgrade
+          ?`<div class="tm-bump-val upgrade">${r.from} → ${r.recommended} lb</div>
+             <div class="tm-bump-reason">${esc(r.reason)}</div>
+             <div class="tm-bump-reason" style="color:var(--txd)">standard would be ${r.standard} lb</div>`
+          :`<div class="tm-bump-val">${r.from} → ${r.standard} lb</div>
+             <div class="tm-bump-reason">${esc(r.reason)}</div>`
+        }
+      </div>
+    </div>`;
+  }).join("");
+
+  let html=`
+    <header class="header">
+      <div class="meta-row">
+        <span class="meta-gold">Cycle ${data.cycle-1} complete</span>
+        <span class="meta-dim">Cycle ${data.cycle} next</span>
+      </div>
+      <h1>Deload done.</h1>
+    </header>
+    <section class="card">
+      <h2 class="card-title">📈 Training maxes updated</h2>
+      <p class="desc">${anyUpgrade
+        ?"Your AMRAP data suggests bumping more than the standard increment on some lifts. Review and choose:"
+        :"Standard increments applied. Your AMRAPs suggest the current progression is on track."
+      }</p>
+      <div class="cycle-complete-panel">${rows}</div>
+      ${anyUpgrade?`
+      <div class="tm-bump-btns">
+        <button class="tm-bump-ok" onclick="applyDataMaxes()">Apply data-backed maxes</button>
+        <button class="tm-bump-secondary" onclick="dismissCyclePanel()">Keep standard</button>
+      </div>
+      <p style="font-size:11px;color:var(--txd);font-family:system-ui,sans-serif;margin-top:8px;text-align:center">You can always edit maxes manually in Progress.</p>
+      `:`<button class="btn" onclick="dismissCyclePanel()">Start Cycle ${data.cycle} →</button>`}
+    </section>`;
+
+  document.getElementById("app-today").innerHTML=html;
+}
+
+function applyDataMaxes(){
+  LIFTS.forEach(l=>{data.maxes[l.id]=session.cycleRecs[l.id].recommended});
+  saveData();flash("Maxes updated ✓");dismissCyclePanel();
+}
+
+function dismissCyclePanel(){
+  session.justFinishedCycle=false;session.cycleRecs=null;session.appliedMaxes=null;
+  renderToday();
+}
+
 // ═══════ RENDER TODAY ═══════
 function renderToday(){
+  if(session.justFinishedCycle){renderCycleCompletePanel();return}
+
   const lift=LIFTS[data.day],wk=WEEKS[data.week],tm=data.maxes[lift.id];
   const working=wk.sets.map(s=>({wt:round5(tm*s.pct),reps:s.reps,amrap:s.amrap,pct:Math.round(s.pct*100)}));
   const warmup=WARMUP_SETS.map(s=>({wt:round5(tm*s.pct),reps:s.reps}));
   const pickCount=Object.keys(session.picks).length;
   const liftHist=data.history.filter(h=>h.lift===lift.id&&h.amrapReps!=null);
-  const stalls=getStallWarnings().filter(w=>w.includes(lift.title));
+  const recentAmraps=liftHist.slice(-3).map(h=>h.amrapReps);
+  const stalls=getStallWarnings().filter(w=>w.title===lift.title);
+
+  // Preserve form values across re-renders
+  const amrapVal=document.getElementById("amrap-input")?.value||"";
+  const notesVal=document.getElementById("notes-input")?.value||"";
+  const bwVal=document.getElementById("bw-input")?.value||"";
+
+  // AMRAP feedback (computed for initial render; also updated live via oninput)
+  const amrapFb=amrapVal?getAmrapFeedbackData(parseInt(amrapVal),data.week,lift):null;
+
+  // Submit state
+  const canSubmit=session.doneSets.size>0;
+  const skips=getSessionSkips(working);
+  const submitLabel=canSubmit
+    ?(skips.length>0?`Log workout (${skips.length} item${skips.length>1?"s":""} skipped)`:"Complete Workout →")
+    :"Do at least one working set to log";
 
   let html=`
     <header class="header">
@@ -386,14 +582,17 @@ function renderToday(){
       </div>
       <h1>${esc(lift.title)}</h1>
       <div class="tm-row">
-        <span class="tm-label">Training max: <strong>${tm} lb</strong></span>
+        <div>
+          <span class="tm-label">Training max: <strong>${tm} lb</strong></span>
+          ${recentAmraps.length>0?`<div class="tm-history">Last ${recentAmraps.length} AMRAP${recentAmraps.length>1?"s":""}: ${recentAmraps.join(" · ")} reps</div>`:""}
+        </div>
         <span class="link" onclick="toggleLiftInfo()">${session.showLiftInfo?"hide":"how to do this"}</span>
       </div>
       ${session.showLiftInfo?`<div class="info-box">${esc(lift.explain)}</div>`:""}
     </header>
 
     ${getDaysSinceBanner()}
-    ${stalls.map(s=>`<div class="stall-banner">${s}</div>`).join("")}
+    ${stalls.map(s=>`<div class="stall-banner">${s.msg}<br><span class="update-tm-link" onclick="switchView('progress')">Update training max →</span></div>`).join("")}
 
     <section class="card">
       <div class="card-head" onclick="toggleWeekInfo()">
@@ -404,29 +603,34 @@ function renderToday(){
     </section>
 
     <section class="card">
-      <div class="card-head" onclick="toggleWarmup()">
+      <div class="card-head"${session.warmDone?' onclick="toggleWarmup()" style="cursor:pointer"':""}>
         <h2 class="card-title">🏃 Warmup</h2>
         <div class="chk${session.warmDone?" on":""}">${session.warmDone?"✓":""}</div>
       </div>
-      <p class="desc">Run 1 mile on the treadmill (speed 7.0, incline 3.0) to get warm and clear your head.</p>
-      <div class="mob-toggle" onclick="toggleMobility()">
-        <span class="mob-txt">${session.mobOpen?"Hide":"Optional: 3 min mobility"}</span>
-        <button class="toggle">${session.mobOpen?"−":"+"}</button>
-      </div>
-      ${session.mobOpen?`<div class="mob-list">${MOBILITY.map(m=>`<div class="mob-item">${esc(m)}</div>`).join("")}</div>`:""}
-    </section>
-
-    <section class="card">
-      <h2 class="card-title">🔥 Warmup Sets</h2>
-      <p class="desc">Light sets to groove the movement. Focus on form.</p>
-      <div class="warm-grid">
-        ${warmup.map((s,i)=>`<div class="warm-cell${session.doneWarm.has(i)?" done":""}" onclick="toggleWarmSet(${i})">
-          <div class="warm-wt">${s.wt}<span class="lb">lb</span></div>
-          <div class="warm-reps">× ${s.reps}</div>
-          <div class="plate-text">${esc(calcPlates(s.wt))}</div>
-          ${session.doneWarm.has(i)?'<div class="mini-chk">✓</div>':""}
-        </div>`).join("")}
-      </div>
+      ${session.warmDone
+        ?`<p class="desc" style="margin-top:8px;margin-bottom:0">Done — tap checkmark to undo.</p>`
+        :`<p class="desc">Run a mile, then hit the empty bar for 10 reps. That's it.</p>
+          <div class="warmup-quick">
+            <button class="warmup-quick-btn${session.warmMode==="quick"?" done":""}" onclick="setWarmMode('quick')">✓ Ran + empty bar</button>
+            <button class="warmup-quick-btn${session.warmMode==="full"?" active-opt":""}" onclick="setWarmMode('full')">${session.warmMode==="full"?"▾ Hide sets":"▸ Full warmup sets"}</button>
+          </div>
+          ${session.warmMode==="full"?`
+            <p class="desc" style="margin-top:12px;margin-bottom:8px">Light sets to groove the movement before going heavy.</p>
+            <div class="warm-grid">
+              ${warmup.map((s,i)=>`<div class="warm-cell${session.doneWarm.has(i)?" done":""}" onclick="toggleWarmSet(${i})">
+                <div class="warm-wt">${s.wt}<span class="lb">lb</span></div>
+                <div class="warm-reps">× ${s.reps}</div>
+                <div class="plate-text">${esc(calcPlates(s.wt))}</div>
+                ${session.doneWarm.has(i)?'<div class="mini-chk">✓</div>':""}
+              </div>`).join("")}
+            </div>
+          `:""}
+          <div class="mob-toggle" onclick="toggleMobility()">
+            <span class="mob-txt">${session.mobOpen?"Hide":"Optional: 3 min mobility"}</span>
+            <button class="toggle">${session.mobOpen?"−":"+"}</button>
+          </div>
+          ${session.mobOpen?`<div class="mob-list">${MOBILITY.map(m=>`<div class="mob-item">${esc(m)}</div>`).join("")}</div>`:""}`
+      }
     </section>
 
     <section class="card">
@@ -450,13 +654,14 @@ function renderToday(){
       <div class="gold-box">
         <label class="lbl">How many reps on the last set?</label>
         <p class="hint">More reps at the same weight over time = getting stronger.</p>
-        <input class="inp" type="number" inputmode="numeric" placeholder="e.g. 8" id="amrap-input" value="${document.getElementById("amrap-input")?.value||""}">
+        <input class="inp" type="number" inputmode="numeric" placeholder="e.g. 8" id="amrap-input" value="${esc(amrapVal)}" oninput="updateAmrapFeedback()">
+        <div id="amrap-feedback" class="amrap-feedback${amrapFb?" "+amrapFb.cls:""}">${amrapFb?amrapFb.msg:""}</div>
       </div>`:""}
       <div class="rest-box">
         <strong>Rest:</strong> 3–5 minutes between these sets.
         <div class="rest-timer-row">
-          <button class="rest-timer-btn" onclick="event.stopPropagation();startTimer(180,'Working set rest')">3:00</button>
-          <button class="rest-timer-btn" onclick="event.stopPropagation();startTimer(300,'Working set rest')">5:00</button>
+          <button class="rest-timer-btn" onclick="startTimer(180,'Working set rest')">3:00</button>
+          <button class="rest-timer-btn" onclick="startTimer(300,'Working set rest')">5:00</button>
         </div>
       </div>
     </section>
@@ -476,18 +681,19 @@ function renderToday(){
               ${sel?'<div class="badge">selected</div>':(!locked?'<div class="tap-hint">tap</div>':"")}
             </div>
             ${expanded&&EX_INFO[a.name]?`<div class="ex-info">${esc(EX_INFO[a.name])}</div>`:""}
-          </div>`}).join("")}
+          </div>`;
+        }).join("")}
       </div>
       <div class="rest-box">
         <strong>Rest:</strong> 1–2 minutes between sets.
         <div class="rest-timer-row">
-          <button class="rest-timer-btn" onclick="event.stopPropagation();startTimer(60,'Assistance rest')">1:00</button>
-          <button class="rest-timer-btn" onclick="event.stopPropagation();startTimer(120,'Assistance rest')">2:00</button>
+          <button class="rest-timer-btn" onclick="startTimer(60,'Assistance rest')">1:00</button>
+          <button class="rest-timer-btn" onclick="startTimer(120,'Assistance rest')">2:00</button>
         </div>
       </div>
     </section>
 
-    <section class="card" onclick="toggleAbs()" style="cursor:pointer">
+    <section class="card" style="cursor:pointer" onclick="toggleAbs()">
       <div class="card-head">
         <h2 class="card-title">🎯 Ab Finisher</h2>
         <div class="chk${session.absDone?" on":""}">${session.absDone?"✓":""}</div>
@@ -508,14 +714,22 @@ function renderToday(){
     <section class="card">
       <label class="lbl">How did it feel?</label>
       <p class="hint">Write anything. This feeds the coach on your Progress page.</p>
-      <textarea class="ta" rows="3" placeholder='e.g. "Felt strong. Had 2 more in me."' id="notes-input">${document.getElementById("notes-input")?.value||""}</textarea>
+      <textarea class="ta" rows="3" placeholder='e.g. "Felt strong. Had 2 more in me."' id="notes-input">${esc(notesVal)}</textarea>
       <div style="margin-top:16px">
         <label class="lbl">Bodyweight? (optional)</label>
-        <input class="inp" type="number" inputmode="decimal" placeholder="e.g. 182" id="bw-input" value="${document.getElementById("bw-input")?.value||""}">
+        <input class="inp" type="number" inputmode="decimal" placeholder="e.g. 182" id="bw-input" value="${esc(bwVal)}">
       </div>
-      <button class="btn${isComplete(working)?"":" off"}" onclick="finishWorkout()" ${isComplete(working)?"":"disabled"}>
-        ${isComplete(working)?"Complete Workout →":"Finish all sections to log"}
+      <button class="btn${canSubmit?"":" off"}" onclick="${canSubmit?"requestSubmit()":""}" ${canSubmit?"":"disabled"}>
+        ${submitLabel}
       </button>
+      ${session.pendingSubmit?`
+      <div class="skip-confirm">
+        <div class="skip-confirm-msg">Logging this workout with skips: <strong>${session.pendingSkips.join(", ")}</strong>. Continue?</div>
+        <div class="skip-confirm-btns">
+          <button class="skip-confirm-ok" onclick="finishWorkout()">Log it</button>
+          <button class="skip-confirm-cancel" onclick="cancelSubmit()">Back</button>
+        </div>
+      </div>`:""}
     </section>`;
 
   if(liftHist.length>0){
@@ -526,8 +740,6 @@ function renderToday(){
   html+=`<div class="time-note">~55 min session</div>`;
   document.getElementById("app-today").innerHTML=html;
 }
-
-function isComplete(working){return session.doneSets.size>=working.length&&Object.keys(session.picks).length>=2&&session.absDone}
 
 // ═══════ RENDER PROGRESS ═══════
 function renderProgress(){
@@ -542,7 +754,6 @@ function renderProgress(){
       <div id="coach-content"></div>
     </section>`;
 
-  // Weekly summary
   if(summary){
     html+=`<section class="card">
       <h2 class="card-title">📊 This Week</h2>
@@ -554,10 +765,9 @@ function renderProgress(){
     </section>`;
   }
 
-  // Stall warnings
   if(stalls.length>0){
     html+=`<section class="card"><h2 class="card-title">⚠️ Attention</h2>`;
-    stalls.forEach(s=>{html+=`<div class="stall-banner" style="margin-top:8px">${s}</div>`});
+    stalls.forEach(s=>{html+=`<div class="stall-banner" style="margin-top:8px">${s.msg}</div>`});
     html+=`</section>`;
   }
 
@@ -602,7 +812,19 @@ function renderProgress(){
 
   html+=`<section class="card"><h2 class="card-title">📖 Workout Log</h2>`;
   if(!data.history.length)html+=`<p class="desc">Nothing logged yet.</p>`;
-  else html+=data.history.slice(-20).reverse().map(h=>{const l=LIFTS.find(x=>x.id===h.lift);return`<div class="hist-entry"><div class="hist-row"><span class="hist-date">${new Date(h.date).toLocaleDateString("en-US",{month:"short",day:"numeric"})}</span><span class="hist-lift">${l?.title||""}</span><span class="hist-detail">${h.topSet}lb${h.amrapReps!=null?` × ${h.amrapReps}`:""}</span></div>${h.notes?`<div class="hist-note">"${esc(h.notes)}"</div>`:""}</div>`}).join("");
+  else html+=data.history.slice(-20).reverse().map(h=>{
+    const l=LIFTS.find(x=>x.id===h.lift);
+    const skipStr=formatSkipEntry(h.skipped);
+    return`<div class="hist-entry">
+      <div class="hist-row">
+        <span class="hist-date">${new Date(h.date).toLocaleDateString("en-US",{month:"short",day:"numeric"})}</span>
+        <span class="hist-lift">${l?.title||""}</span>
+        <span class="hist-detail">${h.topSet}lb${h.amrapReps!=null?` × ${h.amrapReps}`:""}</span>
+      </div>
+      ${h.notes?`<div class="hist-note">"${esc(h.notes)}"</div>`:""}
+      ${skipStr?`<div class="hist-skip">skipped: ${esc(skipStr)}</div>`:""}
+    </div>`;
+  }).join("");
   html+=`</section>`;
 
   html+=`<section class="card">
@@ -617,13 +839,39 @@ function renderProgress(){
 // ═══════ ACTIONS ═══════
 function toggleLiftInfo(){session.showLiftInfo=!session.showLiftInfo;renderToday()}
 function toggleWeekInfo(){session.showWeekInfo=!session.showWeekInfo;renderToday()}
-function toggleWarmup(){session.warmDone=!session.warmDone;renderToday()}
+function toggleWarmup(){
+  session.warmDone=!session.warmDone;
+  if(!session.warmDone){session.warmMode=null;session.doneWarm=new Set()}
+  renderToday();
+}
 function toggleMobility(){session.mobOpen=!session.mobOpen;renderToday()}
 function toggleAbs(){session.absDone=!session.absDone;renderToday()}
-function toggleWarmSet(i){session.doneWarm.has(i)?session.doneWarm.delete(i):session.doneWarm.add(i);renderToday()}
+function toggleWarmSet(i){
+  session.doneWarm.has(i)?session.doneWarm.delete(i):session.doneWarm.add(i);
+  if(session.doneWarm.size>=3)session.warmDone=true;
+  renderToday();
+}
+function setWarmMode(mode){
+  if(mode==="quick"){session.warmMode="quick";session.warmDone=true}
+  else{session.warmMode=session.warmMode==="full"?null:"full"}
+  renderToday();
+}
 function toggleWorkSet(i){session.doneSets.has(i)?session.doneSets.delete(i):session.doneSets.add(i);renderToday()}
 function toggleExInfo(n){session.expandedEx=session.expandedEx===n?null:n;renderToday()}
 function togglePick(i,n){const c=Object.keys(session.picks).length;if(session.picks[i]!==undefined)delete session.picks[i];else if(c<2)session.picks[i]=n;renderToday()}
+
+function requestSubmit(){
+  const lift=LIFTS[data.day],wk=WEEKS[data.week],tm=data.maxes[lift.id];
+  const working=wk.sets.map(s=>({wt:round5(tm*s.pct)}));
+  const skips=getSessionSkips(working);
+  if(skips.length===0){finishWorkout();return}
+  session.pendingSubmit=true;session.pendingSkips=skips;
+  renderToday();
+  // Scroll to bottom so confirm panel is visible
+  setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"}),50);
+}
+
+function cancelSubmit(){session.pendingSubmit=false;session.pendingSkips=[];renderToday()}
 
 function finishWorkout(){
   const lift=LIFTS[data.day],wk=WEEKS[data.week],tm=data.maxes[lift.id];
@@ -631,12 +879,43 @@ function finishWorkout(){
   const amrapVal=document.getElementById("amrap-input")?.value;
   const bwVal=document.getElementById("bw-input")?.value;
   const notesVal=document.getElementById("notes-input")?.value;
+
+  // Compute skips for the log entry
+  const skipped=[];
+  const missedSets=working.length-session.doneSets.size;
+  if(missedSets>0)skipped.push({type:"working_sets",completed:session.doneSets.size,total:working.length});
+  if(Object.keys(session.picks).length<2)skipped.push({type:"assistance",completed:Object.keys(session.picks).length,total:2});
+  if(!session.absDone)skipped.push({type:"abs"});
+
+  // Check if this workout completes a full cycle (deload week, last day)
+  const willFinishCycle=(data.day===3&&data.week===3);
+  let recs=null;
+  if(willFinishCycle)recs=calcRecommendedTmBumps();
+
   let nDay=data.day+1,nWeek=data.week,nCycle=data.cycle,nMaxes={...data.maxes};
   if(nDay>=4){nDay=0;nWeek++;if(nWeek>=4){nWeek=0;nCycle++;LIFTS.forEach(l=>{nMaxes[l.id]+=l.inc})}}
-  const entry={date:new Date().toISOString(),cycle:data.cycle,week:data.week,day:data.day,lift:lift.id,amrapReps:amrapVal?parseInt(amrapVal):null,topSet:working[working.length-1].wt,assists:Object.values(session.picks),bw:bwVal?parseFloat(bwVal):null,notes:notesVal?.trim()||null};
+
+  const entry={
+    date:new Date().toISOString(),cycle:data.cycle,week:data.week,day:data.day,lift:lift.id,
+    amrapReps:amrapVal?parseInt(amrapVal):null,topSet:working[working.length-1].wt,
+    assists:Object.values(session.picks),bw:bwVal?parseFloat(bwVal):null,
+    notes:notesVal?.trim()||null,
+    skipped:skipped.length>0?skipped:null
+  };
+
   if(bwVal)data.bwLog.push({date:new Date().toISOString(),wt:parseFloat(bwVal)});
   data.history.push(entry);data.day=nDay;data.week=nWeek;data.cycle=nCycle;data.maxes=nMaxes;
-  saveData();resetSession();flash("Workout logged ✓");renderToday();
+  saveData();
+
+  if(recs){
+    resetSession();
+    session.justFinishedCycle=true;session.cycleRecs=recs;session.appliedMaxes=nMaxes;
+    flash("Cycle complete!");
+  }else{
+    resetSession();
+    flash("Workout logged ✓");
+  }
+  renderToday();
 }
 
 function skipDeload(){
