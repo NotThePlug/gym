@@ -781,6 +781,16 @@ function renderProgress(){
       ${LIFTS.map((l,i)=>`<span class="rm-chip${i===data.day?" now":""}">${esc(l.title)}</span>`).join("")}
     </div>
     ${data.week===3?`<button class="btn-ghost" style="margin-top:14px" onclick="skipDeload()">Skip deload → start next cycle</button>`:""}
+    ${editingPos?`
+    <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
+      <div class="max-label" style="text-align:left;margin-bottom:4px">Cycle number (just a label)</div>
+      <input class="inp" type="number" inputmode="numeric" id="pos-cycle" value="${data.cycle}" style="margin-bottom:12px">
+      <div class="max-label" style="text-align:left;margin-bottom:4px">Current week</div>
+      <select class="inp" id="pos-week" style="margin-bottom:12px">${WEEKS.map((w,i)=>`<option value="${i}"${i===data.week?" selected":""}>${esc(w.short)}</option>`).join("")}</select>
+      <div class="max-label" style="text-align:left;margin-bottom:4px">Next lift up</div>
+      <select class="inp" id="pos-day" style="margin-bottom:4px">${LIFTS.map((l,i)=>`<option value="${i}"${i===data.day?" selected":""}>${esc(l.title)}</option>`).join("")}</select>
+      <button class="btn" onclick="savePos()">Set my spot</button>
+    </div>`:`<p class="tucked"><u onclick="toggleEditPos()">Correct my current spot</u></p>`}
   </section>
 
   <section class="card">
@@ -945,6 +955,17 @@ function skipDeload(){
 
 function toggleEditMaxes(){editingMaxes=!editingMaxes;renderProgress();}
 function saveMaxes(){LIFTS.forEach(l=>{const v=document.getElementById(`max-${l.id}`)?.value;if(v)data.maxes[l.id]=parseInt(v)||data.maxes[l.id];});saveData();editingMaxes=false;flash("Updated");renderProgress();}
+let editingPos=false;
+function toggleEditPos(){editingPos=!editingPos;renderProgress();}
+function savePos(){
+  const c=parseInt(document.getElementById("pos-cycle")?.value);
+  const w=parseInt(document.getElementById("pos-week")?.value);
+  const d=parseInt(document.getElementById("pos-day")?.value);
+  if(!isNaN(c)&&c>=1)data.cycle=c;
+  if(!isNaN(w)&&w>=0&&w<WEEKS.length)data.week=w;
+  if(!isNaN(d)&&d>=0&&d<LIFTS.length)data.day=d;
+  saveData();clearSession();editingPos=false;flash("Position set ✓");renderProgress();
+}
 function toggleLog(){showLog=!showLog;renderProgress();}
 function addBw(){const v=document.getElementById("bw-add-input")?.value;if(!v)return;const today=new Date().toISOString().slice(0,10);data.bwLog=data.bwLog.filter(b=>b.date.slice(0,10)!==today);data.bwLog.push({date:new Date().toISOString(),wt:parseFloat(v)});saveData();flash("Bodyweight logged ✓");renderProgress();}
 
