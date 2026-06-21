@@ -365,13 +365,33 @@ function blankSession(){return{pos:null,ranMile:false,emptyBar:false,doneSets:[]
 
 function posKey(){return `${data.cycle}-${data.week}-${data.day}`;}
 
+/* Scan all of localStorage for anything that looks like saved tracker data
+   (an object with maxes + a history array), under any key. Richest history wins.
+   Robust to old key names and to an empty v8 that a prior load may have written. */
+function legacyCandidates(){
+  const cands=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(!k||k===STORAGE_KEY||k===SESSION_KEY)continue;
+    if(k.indexOf("session")>=0||k.indexOf("coach")>=0)continue;
+    try{
+      const d=JSON.parse(localStorage.getItem(k));
+      if(d&&typeof d==="object"&&d.maxes&&Array.isArray(d.history))cands.push(d);
+    }catch{}
+  }
+  cands.sort((a,b)=>(b.history.length-a.history.length));
+  return cands;
+}
+
 function loadData(){
   try{
-    const cur=localStorage.getItem(STORAGE_KEY);
-    if(cur){data=JSON.parse(cur);}
-    else{
-      const old=localStorage.getItem(OLD_KEY);
-      if(old){data=migrateOld(JSON.parse(old));saveData();flash("Welcome back — your history carried over ✓");}
+    let cur=null;try{const c=localStorage.getItem(STORAGE_KEY);cur=c?JSON.parse(c):null;}catch{}
+    if(cur&&Array.isArray(cur.history)&&cur.history.length>0){
+      data=cur;
+    }else{
+      const cands=legacyCandidates();
+      if(cands.length){data=migrateOld(cands[0]);saveData();flash("History recovered ✓");}
+      else if(cur){data=cur;}              // empty new-key data, nothing better to recover
       else{data=freshData();saveData();}
     }
   }catch{data=freshData();}
